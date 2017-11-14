@@ -32,6 +32,67 @@ Posts will be styled using the account creators name.
 * bootstrap
 * cookies
 
-## Other changes
+## Data structures
+```JSON
+{
 
+  "users": [
+    {
+      "email": "phillip@email.address",
+      "name": "Phillip Mispagel",
+      "photo": "/path/to/uploaded/photo.jpg",
+      "createdAt": "timestamp",
+      "updatedAt": "timestamp",
+      "guestOf": "mispagel"
+    },
+    {
+      "email": "jenny@email.address",
+      "name": "Jenny Rudnick",
+      "photo": "/path/to/uploaded/photo.jpg",
+      "createdAt": "timestamp",
+      "updatedAt": "timestamp",
+      "guestOf": "rudnick"
+    }
+  ],
+  "rooms": [
+    {
+      "type": "premium garden"
+    },
+    {
+      "type": "preferred ocean"
+    }
+  ],
+  "posts": [
+    {
+      "id": "1234",
+      "owner": "phillip@email.address",
+      "title": "Looking for roomie!",
+      "body": "I'm looking to save money on a room and would love to bunk with someone, please hit me up!",
+      "roomType": "premium garden",
+      "postDate": "timestamp",
+      "editDate": "timestamp",
+      "completed": false
+    }
+  ],
+  "comments": [
+    {
+      "id": "2345",
+      "postId": "1234",
+      "owner": "jenny@email.address",
+      "body": "I'd love to room with you!",
+      "postDate": "timestamp",
+      "editDate": "timestamp"
+    },
+    {
+      "id": "2346",
+      "postId": "1234",
+      "owner": "phillip@email.address",
+      "body": "Excellent, let's do it!",
+      "postDate": "timestamp",
+      "editDate": "timestamp"
+    }
+  ]
+}
+
+```
 _[Describe any other notable changes.]_
