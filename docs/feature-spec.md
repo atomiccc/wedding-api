@@ -43,7 +43,8 @@ Posts will be styled using the account creators name.
       "photo": "/path/to/uploaded/photo.jpg",
       "createdAt": "timestamp",
       "updatedAt": "timestamp",
-      "guestOf": "mispagel"
+      "guestOf": "mispagel",
+      "password": "encrypted hash"
     },
     {
       "email": "jenny@email.address",
@@ -51,7 +52,8 @@ Posts will be styled using the account creators name.
       "photo": "/path/to/uploaded/photo.jpg",
       "createdAt": "timestamp",
       "updatedAt": "timestamp",
-      "guestOf": "rudnick"
+      "guestOf": "rudnick",
+      "password": "encrypted hash"
     }
   ],
   "rooms": [
