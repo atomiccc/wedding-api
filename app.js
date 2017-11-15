@@ -2,7 +2,11 @@ const Koa = new require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
+const bcrypt = require('bcrypt');
+const saltRounds = 9;
+
 const r = require('rethinkdbdash')();
+
 
 r.db('test').tableList().run().then((tables) => {
   console.log(tables);
@@ -25,24 +29,16 @@ function getMessage(ctx, next) {
 }
 
 async function addUser(ctx, next) {
-  console.log(ctx.request.body);
-
-  let {
-    email,
-    password
-  } = ctx.request.body;
+  let { email, password } = ctx.request.body;
 
   try {
-    let user = await r.table('users').insert({
-      email,
-      password
-    });
-
+    let hash = await bcrypt.hash(password, saltRounds);
+    let user = await r.table('users').insert({ email, password: hash });
     ctx.body = user;
   }
   catch(e) {
     ctx.status = 500;
-    ctx.body = e.message || 'whoops!';
+    ctx.body = e.message || 'error adding user!';
   }
 }
 
@@ -53,7 +49,7 @@ async function listUsers(ctx, next) {
   }
   catch(e) {
     ctx.status = 500;
-    ctx.body = e.message || 'whoops!';
+    ctx.body = e.message || 'error listing users!';
   }
 }
 
