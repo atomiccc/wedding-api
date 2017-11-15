@@ -1,71 +1,26 @@
 const Koa = new require('koa');
-const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
+const app = new Koa();
 
-const bcrypt = require('bcrypt');
-const saltRounds = 9;
-
+// instantiate RethinkDB and start connetion pool
 const r = require('rethinkdbdash')();
 
-// r.db('test').tableDrop('users').run();
+// add r to ctx prototype so we don't need to import the database into every route
+// this is arguably not necessary since we are passing r into the route file also,
+// but this will allow us to not be dependent on doing so in the future
+app.context.r = r;
 
-r.db('test').tableList().run().then((tables) => {
-  console.log(tables);
-  if (!tables.includes('users')) {
-    r.tableCreate('users', { primaryKey: 'email' }).run();
-  }
-});
+// parse body so ctx.request.body = { key: 'value' }
+app.use(bodyParser());
 
-const koa = new Koa();
-const router  = new Router();
+// routes - passing in r so we can keep initial database setup stuff for each
+// route within the route file
+const users = require('./routes/users')(r);
+const posts = require('./routes/posts')(r);
 
-koa.use(bodyParser());
+app.use(users.routes());
+app.use(posts.routes());
 
-router.post('/users', addUser);
-router.post('/users/auth', authUser);
-router.get('/users', listUsers);
-
-async function addUser(ctx, next) {
-  let { email, password } = ctx.request.body;
-  try {
-    let hash = await bcrypt.hash(password, saltRounds);
-    let user = await r.table('users').insert({ email, password: hash });
-    ctx.body = user;
-  }
-  catch(e) {
-    ctx.status = 500;
-    console.error(e.message);
-    ctx.body = 'error adding user!';
-  }
-}
-
-async function listUsers(ctx, next) {
-  try {
-    let users = await r.table('users');
-    ctx.body = users;
-  }
-  catch(e) {
-    ctx.status = 500;
-    ctx.body = e.message || 'error listing users!';
-  }
-}
-
-async function authUser(ctx, next) {
-  let { email, password } = ctx.request.body;
-  try {
-    let user = await r.table('users').get(email);
-    let authorized = await bcrypt.compare(password, user.password);
-    ctx.body = authorized ? 'authorized!' : 'bad password!';
-  }
-  catch(e) {
-    ctx.status = 500;
-    console.error(e.message);
-    ctx.body = 'error authorizing!';
-  }
-}
-
-koa.use(router.routes());
-
-koa.listen(31337, function() {
+app.listen(31337, function() {
   console.log('Server running on https://localhost:31337');
 });
