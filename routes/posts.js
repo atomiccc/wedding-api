@@ -3,11 +3,11 @@ const router  = new Router();
 
 // export function so we can pass r in and initialize database if need be
 // this might change in the future and is really just for convenience
-module.exports = (r) => {
-  // r.db('test').tableDrop('posts').run();
-  r.db('test').tableList().run().then((tables) => {
+module.exports = (rethinkdb) => {
+  //rethinkdb.db('test').tableDrop('posts').run();
+ rethinkdb.db('test').tableList().run().then((tables) => {
     if (!tables.includes('posts')) {
-      r.tableCreate('posts').run();
+     rethinkdb.tableCreate('posts').run();
     }
   });
 
@@ -31,7 +31,7 @@ async function createPost(ctx, next) {
         ctx.body = 'required parameters: title, body, owner';
     }
     else {
-      let post = await ctx.r.table('posts').insert({
+      let post = await ctx.rethinkdb.table('posts').insert({
         title,
         body,
         createdBy,
@@ -51,7 +51,7 @@ async function createPost(ctx, next) {
 
 async function getPosts(ctx, next) {
   try {
-    let posts = await ctx.r.table('posts')
+    let posts = await ctx.rethinkdb.table('posts')
     ctx.body = posts;
   }
   catch(e) {

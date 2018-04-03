@@ -5,12 +5,12 @@ const saltRounds = 9;
 
 // export function so we can pass r in and initialize database if need be
 // this might change in the future and is really just for convenience
-module.exports = (r) => {
-  // r.db('test').tableDrop('users').run();
-  r.db('test').tableList().run().then((tables) => {
+module.exports = (rethinkdb) => {
+  //rethinkdb.db('test').tableDrop('users').run();
+ rethinkdb.db('test').tableList().run().then((tables) => {
     console.log(tables);
     if (!tables.includes('users')) {
-      r.tableCreate('users', { primaryKey: 'email' }).run();
+     rethinkdb.tableCreate('users', { primaryKey: 'email' }).run();
     }
   });
 
@@ -31,7 +31,7 @@ async function createUser(ctx, next) {
   let { email, password } = ctx.request.body;
   try {
     let hash = await bcrypt.hash(password, saltRounds);
-    let user = await ctx.r.table('users').insert({ email, password: hash });
+    let user = await ctx.rethinkdb.table('users').insert({ email, password: hash });
     ctx.body = user;
   }
   catch(e) {
@@ -44,7 +44,7 @@ async function createUser(ctx, next) {
 async function authUser(ctx, next) {
   let { email, password } = ctx.request.body;
   try {
-    let user = await ctx.r.table('users').get(email);
+    let user = await ctx.rethinkdb.table('users').get(email);
     let authorized = await bcrypt.compare(password, user.password);
     if (authorized) {
       ctx.body = 'authorized!';
@@ -63,7 +63,7 @@ async function authUser(ctx, next) {
 
 async function getUsers(ctx, next) {
   try {
-    let users = await ctx.r.table('users');
+    let users = await ctx.rethinkdb.table('users');
     ctx.body = users;
   }
   catch(e) {
